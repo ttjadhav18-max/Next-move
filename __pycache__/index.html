@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Learning Gap Detector</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 25px 7%;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            opacity: 0.9;
+        }
+
+        /* MAIN */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* CARDS */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.07);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+        }
+
+        /* STUDENT FORM */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            margin-top: 7px;
+            border: 1px solid #d5d9e2;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        /* QUESTIONS */
+        .question {
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e6ef;
+            border-radius: 12px;
+            background: #fafbff;
+        }
+
+        .question h3 {
+            margin-bottom: 15px;
+        }
+
+        .option {
+            display: block;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option:hover {
+            background: #eef2ff;
+        }
+
+        .option input {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        /* BUTTON */
+        button {
+            border: none;
+            border-radius: 9px;
+            padding: 14px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .primary:hover {
+            background: #4338ca;
+        }
+
+        .secondary {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        /* RESULTS */
+        #results {
+            display: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .stat {
+            background: #f8faff;
+            padding: 22px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat h3 {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat p {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+
+        /* PROGRESS */
+        .topic {
+            margin-bottom: 20px;
+        }
+
+        .topic-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        .progress {
+            height: 14px;
+            background: #e5e7eb;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 20px;
+            transition: width 1s;
+        }
+
+        /* STATUS */
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .critical {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .improve {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .strong {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* AI BOX */
+        .ai-box {
+            padding: 20px;
+            background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+            border-left: 5px solid #4f46e5;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .ai-box h3 {
+            margin-bottom: 8px;
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
+
+        /* MOBILE */
+        @media(max-width: 800px) {
+
+            .form-grid,
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-content">
+        <h1>🎓 AI-Powered Learning Gap Detector</h1>
+        <p>Identify • Analyze • Improve Student Learning</p>
+    </div>
+</header>
+
+
+<div class="container">
+
+    <!-- STUDENT DETAILS -->
+    <div class="card">
+
+        <h2>👨‍🎓 Student Information</h2>
+
+        <div class="form-grid">
+
+            <div>
+                <label>Student Name</label>
+                <input
+                    type="text"
+                    id="studentName"
+                    placeholder="Enter student name"
+                >
+            </div>
+
+            <div>
+                <label>Class</label>
+
+                <select id="studentClass">
+
+                    <option value="">
+                        Select Class
+                    </option>
+
+                    <option>8th</option>
+                    <option>9th</option>
+                    <option>10th</option>
+                    <option>11th</option>
+                    <option>12th</option>
+
+                </select>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- QUIZ -->
+    <div class="card">
+
+        <h2>📝 Diagnostic Assessment</h2>
+
+        <p style="margin-bottom:20px;color:#64748b;">
+            Answer all questions. The system will analyze your
+            topic-wise learning performance.
+        </p>
+
+        <form id="quizForm"></form>
+
+        <button
+            class="primary"
+            onclick="analyzeQuiz()"
+            type="button"
+        >
+            🔍 Analyze My Learning
+        </button>
+
+        <button
+            class="secondary"
+            onclick="resetQuiz()"
+            type="button"
+        >
+            Reset
+        </button>
+
+    </div>
+
+
+    <!-- RESULTS -->
+    <div id="results">
+
+        <!-- OVERALL STATS -->
+        <div class="card">
+
+            <h2>📊 Performance Overview</h2>
+
+            <div class="stats">
+
+                <div class="stat">
+                    <h3>Overall Score</h3>
+                    <p id="overallScore">0%</p>
+                </div>
+
+                <div class="stat">
+                    <h3>Correct Answers</h3>
+                    <p id="correctAnswers">0</p>
+                </div>
+
+                <div class="stat">
+                    <h3>Learning Gaps</h3>
+                    <p id="gapCount">0</p>
+                </div>
+
+                <div class="stat">
+                    <h3>Performance</h3>
+                    <p id="performanceLevel">-</p>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TOPIC PERFORMANCE -->
+        <div class="card">
+
+            <h2>📈 Topic-wise Performance</h2>
+
+            <div id="topicPerformance"></div>
+
+        </div>
+
+
+        <!-- GAP TABLE -->
+        <div class="card">
+
+            <h2>🔎 Detected Learning Gaps</h2>
+
+            <div style="overflow-x:auto;">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Topic</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                            <th>Recommendation</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="gapTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- AI RECOMMENDATIONS -->
+        <div class="card">
+
+            <h2>🤖 AI Personalized Recommendations</h2>
+
+            <div id="recommendations"></div>
+
+        </div>
+
+
+        <!-- STUDY PLAN -->
+        <div class="card">
+
+            <h2>📚 Personalized Study Plan</h2>
+
+            <div id="studyPlan"></div>
+
+        </div>
+
+
+        <!-- FINAL -->
+        <div class="card">
+
+            <h2>🎯 AI Learning Summary</h2>
+
+            <div id="summary" class="ai-box"></div>
+
+            <button
+                class="primary"
+                onclick="window.print()"
+            >
+                🖨️ Download / Print Report
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<footer>
+    AI-Powered Learning Gap Detector | Hackathon Project
+</footer>
+
+
+<script>
+
+    /* =========================================
+       QUESTION DATABASE
+    ========================================= */
+
+    const questions = [
+
+        {
+            question: "What is 25% of 200?",
+            options: ["25", "40", "50", "75"],
+            answer: "50",
+            topic: "Percentages"
+        },
+
+        {
+            question: "If x + 5 = 12, what is x?",
+            options: ["5", "6", "7", "8"],
+            answer: "7",
+            topic: "Algebra"
+        },
+
+        {
+            question:
+            "What is the area of a rectangle with length 10 cm and width 5 cm?",
+            options:
+            ["15 cm²", "30 cm²", "50 cm²", "100 cm²"],
+            answer: "50 cm²",
+            topic: "Geometry"
+        },
+
+        {
+            question: "What is 12 × 8?",
+            options: ["86", "96", "108", "112"],
+            answer: "96",
+            topic: "Arithmetic"
+        },
+
+        {
+            question:
+            "Which planet is known as the Red Planet?",
+            options:
+            ["Earth", "Mars", "Jupiter", "Venus"],
+            answer: "Mars",
+            topic: "Science"
+        },
+
+        {
+            question:
+            "Water boils at what temperature at sea level?",
+            options:
+            ["50°C", "75°C", "100°C", "150°C"],
+            answer: "100°C",
+            topic: "Science"
+        },
+
+        {
+            question:
+            "Which gas do humans need for respiration?",
+            options:
+            [
+                "Carbon dioxide",
+                "Oxygen",
+                "Nitrogen",
+                "Hydrogen"
+            ],
+            answer: "Oxygen",
+            topic: "Biology"
+        },
+
+        {
+            question:
+            "What is the synonym of 'Happy'?",
+            options:
+            ["Sad", "Angry", "Joyful", "Tired"],
+            answer: "Joyful",
+            topic: "English"
+        },
+
+        {
+            question:
+            "What is 15 + 27?",
+            options:
+            ["32", "42", "52", "62"],
+            answer: "42",
+            topic: "Arithmetic"
+        },
+
+        {
+            question:
+            "A triangle has how many sides?",
+            options:
+            ["2", "3", "4", "5"],
+            answer: "3",
+            topic: "Geometry"
+        }
+
+    ];
+
+
+    /* =========================================
+       LOAD QUESTIONS
+    ========================================= */
+
+    function loadQuestions() {
+
+        const form =
+            document.getElementById("quizForm");
+
+        form.innerHTML = "";
+
+        questions.forEach((q, index) => {
+
+            let html = `
+
+                <div class="question">
+
+                    <h3>
+                        Q${index + 1}. ${q.question}
+                    </h3>
+
+            `;
+
+            q.options.forEach(option => {
+
+                html += `
+
+                    <label class="option">
+
+                        <input
+                            type="radio"
+                            name="q${index}"
+                            value="${option}"
+                        >
+
+                        ${option}
+
+                    </label>
+
+                `;
+
+            });
+
+            html += `</div>`;
+
+            form.innerHTML += html;
+
+        });
+
+    }
+
+
+    /* =========================================
+       ANALYZE QUIZ
+    ========================================= */
+
+    function analyzeQuiz() {
+
+        const name =
+            document.getElementById("studentName").value;
+
+        const studentClass =
+            document.getElementById("studentClass").value;
+
+
+        if (!name || !studentClass) {
+
+            alert(
+                "Please enter student name and select class."
+            );
+
+            return;
+        }
+
+
+        let unanswered = false;
+
+        let topicData = {};
+
+        let totalCorrect = 0;
+
+
+        /* CREATE TOPIC DATA */
+
+        questions.forEach((q, index) => {
+
+            const selected =
+                document.querySelector(
+                    `input[name="q${index}"]:checked`
+                );
+
+            if (!selected) {
+
+                unanswered = true;
+
+                return;
+
+            }
+
+
+            const answer = selected.value;
+
+
+            if (!topicData[q.topic]) {
+
+                topicData[q.topic] = {
+
+                    correct: 0,
+                    total: 0
+
+                };
+
+            }
+
+
+            topicData[q.topic].total++;
+
+
+            if (answer === q.answer) {
+
+                topicData[q.topic].correct++;
+
+                totalCorrect++;
+
+            }
+
+        });
+
+
+        if (unanswered) {
+
+            alert(
+                "Please answer all questions before analysis."
+            );
+
+            return;
+        }
+
+
+        /* CALCULATE RESULTS */
+
+        let results = [];
+
+        Object.keys(topicData).forEach(topic => {
+
+            const data = topicData[topic];
+
+            const score =
+                Math.round(
+                    (data.correct / data.total) * 100
+                );
+
+
+            let level;
+            let recommendation;
+
+
+            if (score < 50) {
+
+                level = "Critical Gap";
+
+                recommendation =
+                    "Revise basic concepts and practice daily.";
+
+            }
+
+            else if (score < 75) {
+
+                level = "Needs Improvement";
+
+                recommendation =
+                    "Revise concepts and solve more questions.";
+
+            }
+
+            else {
+
+                level = "Strong";
+
+                recommendation =
+                    "Continue advanced-level practice.";
+
+            }
+
+
+            results.push({
+
+                topic,
+                score,
+                level,
+                recommendation
+
+            });
+
+        });
+
+
+        const overall =
+            Math.round(
+                (totalCorrect / questions.length) * 100
+            );
+
+
+        const gaps =
+            results.filter(
+                r => r.level !== "Strong"
+            );
+
+
+        /* SHOW RESULTS */
+
+        document.getElementById(
+            "results"
+        ).style.display = "block";
+
+
+        document.getElementById(
+            "overallScore"
+        ).innerText = overall + "%";
+
+
+        document.getElementById(
+            "correctAnswers"
+        ).innerText =
+            totalCorrect + "/" + questions.length;
+
+
+        document.getElementById(
+            "gapCount"
+        ).innerText =
+            gaps.length;
+
+
+        let performance;
+
+
+        if (overall < 50) {
+
+            performance = "Needs Help";
+
+        }
+
+        else if (overall < 75) {
+
+            performance = "Average";
+
+        }
+
+        else {
+
+            performance = "Excellent";
+
+        }
+
+
+        document.getElementById(
+            "performanceLevel"
+        ).innerText =
+            performance;
+
+
+        /* TOPIC PERFORMANCE */
+
+        const performanceDiv =
+            document.getElementById(
+                "topicPerformance"
+            );
+
+        performanceDiv.innerHTML = "";
+
+
+        results.forEach(r => {
+
+            let barClass = "";
+
+            if (r.score < 50) {
+
+                barClass = "critical";
+
+            }
+
+            else if (r.score < 75) {
+
+                barClass = "improve";
+
+            }
+
+            else {
+
+                barClass = "strong";
+
+            }
+
+
+            performanceDiv.innerHTML += `
+
+                <div class="topic">
+
+                    <div class="topic-header">
+
+                        <span>
+                            ${r.topic}
+                        </span>
+
+                        <span>
+                            ${r.score}%
+                        </span>
+
+                    </div>
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-bar ${barClass}"
+                            style="width:${r.score}%"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        });
+
+
+        /* GAP TABLE */
+
+        const table =
+            document.getElementById(
+                "gapTable"
+            );
+
+        table.innerHTML = "";
+
+
+        results.forEach(r => {
+
+            let className = "";
+
+            if (r.level === "Critical Gap") {
+
+                className = "critical";
+
+            }
+
+            else if (
+                r.level === "Needs Improvement"
+            ) {
+
+                className = "improve";
+
+            }
+
+            else {
+
+                className = "strong";
+
+            }
+
+
+            table.innerHTML += `
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            ${r.topic}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${r.score}%
+                    </td>
+
+                    <td>
+                        <span class="status ${className}">
+                            ${r.level}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${r.recommendation}
+                    </td>
+
+                </tr>
+
+            `;
+
+        });
+
+
+        /* AI RECOMMENDATIONS */
+
+        const recommendations =
+            document.getElementById(
+                "recommendations"
+            );
+
+        recommendations.innerHTML = "";
+
+
+        if (gaps.length === 0) {
+
+            recommendations.innerHTML = `
+
+                <div class="ai-box">
+
+                    <h3>
+                        🎉 Excellent Performance!
+                    </h3>
+
+                    <p>
+                        No major learning gaps were detected.
+                        You can move to advanced-level questions.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+        else {
+
+            gaps.forEach(gap => {
+
+                recommendations.innerHTML += `
+
+                    <div class="ai-box">
+
+                        <h3>
+                            🤖 ${gap.topic}
+                        </h3>
+
+                        <p>
+                            Current Score:
+                            <strong>${gap.score}%</strong>
+                        </p>
+
+                        <p style="margin-top:8px;">
+                            ${gap.recommendation}
+                        </p>
+
+                    </div>
+
+                `;
+
+            });
+
+        }
+
+
+        /* STUDY PLAN */
+
+        const studyPlan =
+            document.getElementById(
+                "studyPlan"
+            );
+
+        studyPlan.innerHTML = "";
+
+
+        if (gaps.length === 0) {
+
+            studyPlan.innerHTML = `
+
+                <div class="ai-box">
+
+                    <h3>
+                        🚀 Advanced Learning
+                    </h3>
+
+                    <p>
+                        Practice difficult questions,
+                        mock tests and application-based problems.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+        else {
+
+            gaps.forEach(
+                (gap, index) => {
+
+                    studyPlan.innerHTML += `
+
+                        <div class="ai-box">
+
+                            <h3>
+                                Day ${index + 1} →
+                                ${gap.topic}
+                            </h3>
+
+                            <p>
+                                ✅ Revise basic concepts
+                            </p>
+
+                            <p>
+                                ✅ Watch concept explanation
+                            </p>
+
+                            <p>
+                                ✅ Solve 10 practice questions
+                            </p>
+
+                            <p>
+                                ✅ Take a mini-test
+                            </p>
+
+                        </div>
+
+                    `;
+
+                }
+            );
+
+        }
+
+
+        /* AI SUMMARY */
+
+        let summaryText = "";
+
+
+        if (overall >= 75) {
+
+            summaryText = `
+                <h3>🌟 Strong Learner</h3>
+
+                <p>
+                    ${name} has demonstrated good understanding
+                    of the assessed concepts.
+                    Focus on advanced questions and application-based learning.
+                </p>
+            `;
+
+        }
+
+        else if (overall >= 50) {
+
+            summaryText = `
+                <h3>📘 Developing Learner</h3>
+
+                <p>
+                    ${name} understands several concepts but
+                    needs targeted practice in weak areas.
+                    A personalized revision plan can improve performance.
+                </p>
+            `;
+
+        }
+
+        else {
+
+            summaryText = `
+                <h3>🚨 Immediate Learning Support Recommended</h3>
+
+                <p>
+                    ${name} has significant learning gaps.
+                    Start with fundamental concepts and
+                    follow the personalized study plan consistently.
+                </p>
+            `;
+
+        }
+
+
+        document.getElementById(
+            "summary"
+        ).innerHTML = summaryText;
+
+
+        /* SCROLL TO RESULTS */
+
+        document.getElementById(
+            "results"
+        ).scrollIntoView({
+            behavior: "smooth"
+        });
+
+    }
+
+
+    /* =========================================
+       RESET
+    ========================================= */
+
+    function resetQuiz() {
+
+        document.getElementById(
+            "quizForm"
+        ).reset();
+
+        document.getElementById(
+            "studentName"
+        ).value = "";
+
+        document.getElementById(
+            "studentClass"
+        ).value = "";
+
+        document.getElementById(
+            "results"
+        ).style.display = "none";
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+
+
+    /* LOAD APP */
+
+    loadQuestions();
+
+</script>
+
+</body>
+</html>
